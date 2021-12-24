@@ -150,7 +150,11 @@ def send_one_ping(my_socket, dest_addr, ID):
     """
     Send one ping to the given >dest_addr<.
     """
-    dest_addr  =  socket.gethostbyname(dest_addr)
+    try:
+        dest_addr  =  socket.gethostbyname(dest_addr)
+    except socket.gaierror, e:
+        print "failed. (socket error: '%s')" % e[1]
+        return
  
     # Header is type (8), code (8), checksum (16), id (16), sequence (16)
     my_checksum = 0
@@ -192,7 +196,10 @@ def do_one(dest_addr, timeout):
  
     my_ID = os.getpid() & 0xFFFF
  
-    send_one_ping(my_socket, dest_addr, my_ID)
+    try:
+        send_one_ping(my_socket, dest_addr, my_ID)
+    except:
+        print "Socket error"
     delay = receive_one_ping(my_socket, my_ID, timeout)
  
     my_socket.close()
